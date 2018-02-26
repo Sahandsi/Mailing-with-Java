@@ -13,12 +13,12 @@ import java.net.*;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-public class Client extends Application // for GUI
-{
 
-    private PrintWriter outputToServer; // send message to server
+public class Client extends Application // for GUI
+
+{
+    private PrintWriter outputToServer ; // send message to server
     private Scanner inputFromServer;    // gets response back from the server
-    //private String username;
     private Socket socket;
     private static InetAddress host = null;
     final int PORT = 1234;
@@ -26,122 +26,140 @@ public class Client extends Application // for GUI
     public static void main(String[] args) {
         try {
             host = InetAddress.getLocalHost();
-        } catch (UnknownHostException ex) {
+            }
+
+            catch (UnknownHostException ex)
+            {
             System.out.println("Host ID Not Found");
-        }
+            }
 
-        do {
+        do
+            {
             launch(args);
-        } while (true);
+            }
 
-    }
-
-    // GUI
-
-    public void start(Stage stage) throws Exception {
-        // set up variables
-
-        socket = new Socket(host, PORT);
-        // scanner set up so that it can scan for any input stream (responses) that come from the server
-        inputFromServer = new Scanner(socket.getInputStream());
-        outputToServer = new PrintWriter(socket.getOutputStream(), true);
-
-
-        Parent root = FXMLLoader.load(getClass().getResource("welcome.fxml"));
-
-
-        //stage.setScene(new Scene(root,800,500));
-        Scene scene;
-//        TextField textUsername;
-//        Button buttonValidate;
-//        Label message ,firstNamePromt;
-//        VBox vbox;
-
-        // initialise the username and the button
-//        firstNamePromt = new Label("Enter your Username :");
-//        textUsername = new TextField();
-//        textUsername.setPrefWidth(900);
-//
-//        buttonValidate = new Button("Submit");
-//        buttonValidate.setPrefWidth(100);
-//
-//        message = new Label();
-
-        // event handler to validate username when the button is pressed
-        //buttonValidate.setOnAction(e -> validateUsername(textUsername.getText(), message));
-
-        // add the textfield and the button to the layout
-//        vbox = new VBox();
-//
-//        vbox.getChildren().add(firstNamePromt);
-//        vbox.getChildren().add(textUsername);
-//        vbox.getChildren().add(buttonValidate);
-//        vbox.getChildren().add(message);
-//        // add the layout to the scene, layout, width, height
-        scene = new Scene(root, 500, 500);
-        //add the scene to the stage
-        stage = new Stage();
-        stage.setScene(scene);
-        stage.show();
-
+            while (true);
     }
 
     @FXML
     private TextField Input;
 
     @FXML
-    private void loginButton (ActionEvent event)
-    {
-
-        String t = Input.getText();
-        validateUsername(t);
-        System.out.println(t);
-
-    }
-
-
-
-    private void validateUsername(String username) {
-//        if (username.isEmpty()) {
-//           // message.setText("Please enter your username");
-//        } else {
-            // send username across to the server
-            outputToServer.println(username);
-            String serverRequest = inputFromServer.nextLine();
-
-            if (serverRequest.equals("true")) {
-                LoadClient();
-            }
-//            else {
-////               // message.setText("wrong username please try again");
-////            }
-        }
-//    }
-
-    private void LoadClient() {
+    public void start(Stage stage) throws Exception {
+        // set up variables
+        Parent root = FXMLLoader.load(getClass().getResource("welcome.fxml"));
         Scene scene;
-        VBox vbox;
-        Stage stage;
-
-        Button inbox = new Button("Inbox");
-        Button email = new Button("Email");
-        Button quit = new Button("Quit");
-
-        inbox.setOnAction(e -> getInbox());
-        email.setOnAction(e -> getEmail());
-        quit.setOnAction(e -> quitApp());
-
-        // add buttons to layout
-        vbox = new VBox();
-        vbox.getChildren().add(inbox);
-        vbox.getChildren().add(email);
-        vbox.getChildren().add(quit);
-
-        scene = new Scene(vbox, 500, 500);
+        scene = new Scene(root, 800, 500);
+        //add the scene to the stage
         stage = new Stage();
         stage.setScene(scene);
         stage.show();
+    }
 
+    private void loader(){
+        try
+        {
+            socket = new Socket(host, PORT);
+            inputFromServer = new Scanner(socket.getInputStream());
+            outputToServer = new PrintWriter(socket.getOutputStream(),true);
+
+        }
+        catch (IOException e)
+        {
+
+            e.printStackTrace();
+            return;
+        }
+
+        if(this.outputToServer == null)
+        {
+            System.out.println("NULL OUTPUT TO SERVER");
+        }
+    }
+
+
+    @FXML
+    private void loginButton(ActionEvent event) throws  IOException
+    {
+        //Calling the Server codes
+        loader();
+        //Making sure that outputToServer is running
+        if (outputToServer == null)
+        {
+            System.out.println("NULL IN LOGIN BUTTON FUNCTION");
+        }
+        //Getting TextBox value
+        String t = Input.getText();
+        //Send it to the Server
+        validateUsername(t);
+    }
+
+
+    @FXML
+    private void validateUsername(String username) throws IOException
+    {
+        if (username.isEmpty())
+        {
+            //message.setText("Please enter your username");
+        }
+        else
+            {
+
+                this.outputToServer.println(username);
+
+                String serverRequest = inputFromServer.nextLine();
+
+                if (serverRequest.equals("true"))
+                {
+                LoadClient();
+                }
+
+                else if (serverRequest.equals("false"))
+                {
+                System.out.println("false login");
+                }
+            }
+    }
+
+
+    @FXML private javafx.scene.control.Button login;
+
+    //For closing the old Scene once user logs in.
+    @FXML
+    private void closeButtonAction(){
+        // get a name of the button to the stage
+        Stage stage = (Stage) login.getScene().getWindow();
+        // close the old stage
+        stage.close();
+    }
+
+    //Loading the new Scene
+    private void LoadClient() throws IOException
+    {
+        Scene scene;
+//        VBox vbox;
+        Stage stage;
+//        Button inbox = new Button("Inbox");
+//        Button email = new Button("Email");
+//        Button quit = new Button("Quit");
+//
+//        inbox.setOnAction(e -> getInbox());
+//        email.setOnAction(e -> getEmail());
+//        quit.setOnAction(e -> quitApp());
+//
+//        // add buttons to layout
+//        vbox = new VBox();
+//        vbox.getChildren().add(inbox);
+//        vbox.getChildren().add(email);
+//        vbox.getChildren().add(quit);
+        outputToServer = new PrintWriter(socket.getOutputStream(),true);
+        closeButtonAction();
+
+        Parent root = FXMLLoader.load(getClass().getResource("mainPage.fxml"));
+        scene = new Scene(root, 800, 500);
+        stage = new Stage();
+        stage.setScene(scene);
+        stage.show();
     }
 
     public void getInbox() {
@@ -157,5 +175,4 @@ public class Client extends Application // for GUI
     public void quitApp() {
         outputToServer.println("close");
     }
-
 }
